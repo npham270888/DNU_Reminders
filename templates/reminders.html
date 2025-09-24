@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Nhắc nhở - DNU Reminder{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="text-primary">
+            <i class="fas fa-bell me-2"></i>Nhắc nhở sự kiện
+        </h2>
+        <p class="text-muted">Các sự kiện sắp diễn ra trong 24 giờ tới</p>
+    </div>
+</div>
+
+{% if upcoming_events %}
+    <div class="row g-4">
+        {% for item in upcoming_events %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow h-100 
+                {% if item.event.event_type == 'Class' %}border-start border-success border-4
+                {% elif item.event.event_type == 'Assignment' %}border-start border-warning border-4
+                {% elif item.event.event_type == 'Exam' %}border-start border-danger border-4
+                {% else %}border-start border-info border-4{% endif %}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="card-title mb-0">{{ item.event.title }}</h6>
+                        <span class="badge 
+                            {% if item.event.event_type == 'Class' %}bg-success
+                            {% elif item.event.event_type == 'Assignment' %}bg-warning
+                            {% elif item.event.event_type == 'Exam' %}bg-danger
+                            {% else %}bg-info{% endif %}">
+                            {{ item.event.event_type }}
+                        </span>
+                    </div>
+                    
+                    <p class="text-muted small mb-2">
+                        <i class="fas fa-calendar me-1"></i>
+                        {{ item.event.datetime.strftime('%d/%m/%Y %H:%M') }}
+                    </p>
+                    
+                    {% if item.event.description %}
+                        <p class="card-text small">{{ item.event.description[:100] }}{% if item.event.description|length > 100 %}...{% endif %}</p>
+                    {% endif %}
+                    
+                    <div class="alert alert-info small mb-3">
+                        <i class="fas fa-clock me-1"></i>
+                        <strong>
+                            {% if item.time_until.days > 0 %}
+                                Còn {{ item.time_until.days }} ngày
+                            {% elif item.time_until.seconds > 3600 %}
+                                Còn {{ (item.time_until.seconds // 3600) }} giờ
+                            {% else %}
+                                Còn {{ (item.time_until.seconds // 60) }} phút
+                            {% endif %}
+                        </strong>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-tag me-1"></i>{{ item.event.source }}
+                        </small>
+                        <a href="{{ url_for('edit_event', event_id=item.event.id) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-edit me-1"></i>Sửa
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="text-center mt-4">
+        <a href="{{ url_for('events') }}" class="btn btn-outline-primary">
+            <i class="fas fa-list me-2"></i>Xem tất cả sự kiện
+        </a>
+    </div>
+{% else %}
+    <div class="card border-0 shadow">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-bell-slash fa-4x text-muted mb-4"></i>
+            <h4 class="text-muted mb-3">Không có sự kiện sắp tới</h4>
+            <p class="text-muted mb-4">Bạn không có sự kiện nào trong 24 giờ tới</p>
+            <div class="d-flex justify-content-center gap-2">
+                <a href="{{ url_for('new_event') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Tạo sự kiện mới
+                </a>
+                <a href="{{ url_for('import_events') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-upload me-2"></i>Import từ JSON
+                </a>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Reminder Settings -->
+<div class="card border-0 shadow mt-4">
+    <div class="card-header bg-light">
+        <h6 class="mb-0">
+            <i class="fas fa-cog me-2"></i>Cài đặt nhắc nhở
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="reminder1" checked>
+                    <label class="form-check-label" for="reminder1">
+                        Nhắc nhở 1 giờ trước
+                    </label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="reminder2" checked>
+                    <label class="form-check-label" for="reminder2">
+                        Nhắc nhở 30 phút trước
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="reminder3">
+                    <label class="form-check-label" for="reminder3">
+                        Nhắc nhở 1 ngày trước
+                    </label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="reminder4">
+                    <label class="form-check-label" for="reminder4">
+                        Nhắc nhở 1 tuần trước
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3">
+            <button class="btn btn-primary btn-sm" onclick="saveReminderSettings()">
+                <i class="fas fa-save me-2"></i>Lưu cài đặt
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function saveReminderSettings() {
+    const settings = {
+        reminder1: document.getElementById('reminder1').checked,
+        reminder2: document.getElementById('reminder2').checked,
+        reminder3: document.getElementById('reminder3').checked,
+        reminder4: document.getElementById('reminder4').checked
+    };
+    
+    // Save to localStorage for demo purposes
+    localStorage.setItem('reminderSettings', JSON.stringify(settings));
+    
+    // Show success message
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-success alert-dismissible fade show';
+    alert.innerHTML = `
+        <i class="fas fa-check me-2"></i>Cài đặt nhắc nhở đã được lưu!
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.querySelector('.container').insertBefore(alert, document.querySelector('.row'));
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+        alert.remove();
+    }, 3000);
+}
+
+// Load saved settings
+document.addEventListener('DOMContentLoaded', function() {
+    const savedSettings = localStorage.getItem('reminderSettings');
+    if (savedSettings) {
+        const settings = JSON.parse(savedSettings);
+        document.getElementById('reminder1').checked = settings.reminder1;
+        document.getElementById('reminder2').checked = settings.reminder2;
+        document.getElementById('reminder3').checked = settings.reminder3;
+        document.getElementById('reminder4').checked = settings.reminder4;
+    }
+});
+
+// Check for browser notifications permission
+if ('Notification' in window) {
+    if (Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+}
+</script>
+{% endblock %}

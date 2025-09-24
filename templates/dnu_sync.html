@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Đồng bộ với hệ thống DNU - DNU Reminder{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="text-primary">
+            <i class="fas fa-sync me-2"></i>Đồng bộ với hệ thống DNU
+        </h2>
+        <p class="text-muted">Đồng bộ lịch học và lịch thi từ hệ thống DNU vào ứng dụng của bạn.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-0 shadow">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-alt me-2"></i>Đồng bộ lịch học và lịch thi
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if session.dnu_session_cookie %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Kết nối DNU:</strong> Bạn đã đăng nhập với hệ thống DNU và có thể đồng bộ dữ liệu.
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('dnu_sync') }}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="week" class="form-label">Chọn tuần học:</label>
+                                    <select class="form-select" id="week" name="week" required>
+                                        {% for week_num in range(1, 56) %}
+                                            <option value="{{ week_num }}" {% if week_num == 5 %}selected{% endif %}>
+                                                Tuần {{ week_num }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text">Chọn tuần học từ 1 đến 55 để đồng bộ lịch học.</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Thông tin đồng bộ:</label>
+                                    <div class="form-control-plaintext">
+                                        <small class="text-muted">
+                                            <strong>Học kỳ:</strong> 1<br>
+                                            <strong>Năm học:</strong> 2025<br>
+                                            <strong>Chuyên ngành:</strong> 0<br>
+                                            <strong>Đợt học:</strong> 0
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-warning btn-lg">
+                                <i class="fas fa-sync me-2"></i>Đồng bộ dữ liệu
+                            </button>
+                            <small class="text-muted text-center mt-2">
+                                Nhấn nút này sẽ đồng bộ cả lịch học và lịch thi từ DNU
+                            </small>
+                        </div>
+                    </form>
+                    
+                    <div class="mt-4">
+                        <h6><i class="fas fa-info-circle me-2"></i>Thông tin về đồng bộ:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-primary"><i class="fas fa-graduation-cap me-2"></i>Lịch học:</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Tự động tạo từ dữ liệu DNU</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Phân loại là "Class"</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Thời gian theo tiết học</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Chi tiết: môn học, phòng, GV</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-danger"><i class="fas fa-file-alt me-2"></i>Lịch thi:</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Tự động tạo từ dữ liệu DNU</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Phân loại là "Exam"</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Thông tin lần thi, đợt thi</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Chi tiết: phòng thi, hình thức</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Chưa kết nối DNU:</strong> Bạn cần đăng nhập với DNU trước khi có thể đồng bộ lịch học.
+                    </div>
+                    
+                    <div class="text-center py-4">
+                        <i class="fas fa-plug fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Vui lòng đăng xuất và đăng nhập lại với token DNU để sử dụng tính năng này.</p>
+                        <a href="{{ url_for('logout') }}" class="btn btn-primary">
+                            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card border-0 shadow">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-question-circle me-2"></i>Hướng dẫn
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6>Để đồng bộ với DNU:</h6>
+                <ol class="small">
+                    <li>Đăng nhập với tài khoản DNU và token session</li>
+                    <li>Chọn tuần học cần đồng bộ (1-55)</li>
+                    <li>Nhấn nút "Đồng bộ lịch học"</li>
+                    <li>Hệ thống sẽ tự động tạo các sự kiện lịch học</li>
+                </ol>
+                
+                <hr>
+                
+                <h6>Lưu ý:</h6>
+                <ul class="small text-muted">
+                    <li>Chỉ đồng bộ được khi đã đăng nhập DNU</li>
+                    <li>Dữ liệu được lấy từ API chính thức của DNU</li>
+                    <li>Có thể đồng bộ nhiều tuần khác nhau</li>
+                    <li>Hệ thống tự động nhận diện và parse thông tin lịch học</li>
+                    <li>Chỉ tạo sự kiện cho các ô có nội dung lịch học thực tế</li>
+                    <li>Thời gian được tính chính xác theo tiết học (60 phút/tiết, tiết 6 bắt đầu 13h)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow mt-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>Lịch sử đồng bộ
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">
+                    <i class="fas fa-clock me-1"></i>
+                    Lần đồng bộ gần nhất: 
+                    {% if session.dnu_session_verified_at %}
+                        {{ session.dnu_session_verified_at.split('T')[0] }}
+                    {% else %}
+                        Chưa có
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

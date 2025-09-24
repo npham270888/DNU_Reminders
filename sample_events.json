@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Lịch học môn Lập trình Web",
+    "event_type": "Class",
+    "datetime": "2024-01-15T08:00:00",
+    "description": "Học về HTML, CSS cơ bản - Phòng Lab 301"
+  },
+  {
+    "title": "Nộp bài tập môn Toán",
+    "event_type": "Assignment",
+    "datetime": "2024-01-16T23:59:00",
+    "description": "Bài tập chương 1 - Đạo hàm và ứng dụng"
+  },
+  {
+    "title": "Thi giữa kỳ môn Lập trình",
+    "event_type": "Exam",
+    "datetime": "2024-01-20T09:00:00",
+    "description": "Thi lý thuyết và thực hành - Phòng thi A101"
+  },
+  {
+    "title": "Lịch học môn Cơ sở dữ liệu",
+    "event_type": "Class",
+    "datetime": "2024-01-17T14:00:00",
+    "description": "Học về SQL và thiết kế database"
+  },
+  {
+    "title": "Seminar môn Trí tuệ nhân tạo",
+    "event_type": "Class",
+    "datetime": "2024-01-18T10:00:00",
+    "description": "Thảo luận về Machine Learning và ứng dụng"
+  },
+  {
+    "title": "Nộp báo cáo dự án cuối kỳ",
+    "event_type": "Assignment",
+    "datetime": "2024-01-25T17:00:00",
+    "description": "Báo cáo dự án môn Lập trình Web - Hạn chót"
+  },
+  {
+    "title": "Thi cuối kỳ môn Toán",
+    "event_type": "Exam",
+    "datetime": "2024-01-30T08:00:00",
+    "description": "Thi cuối kỳ môn Toán cao cấp - Phòng thi B201"
+  },
+  {
+    "title": "Lịch học môn Mạng máy tính",
+    "event_type": "Class",
+    "datetime": "2024-01-22T13:00:00",
+    "description": "Học về giao thức TCP/IP và mạng LAN"
+  },
+  {
+    "title": "Thực hành môn Lập trình",
+    "event_type": "Class",
+    "datetime": "2024-01-19T15:00:00",
+    "description": "Thực hành lập trình Python - Phòng Lab 302"
+  },
+  {
+    "title": "Nộp bài tập nhóm môn AI",
+    "event_type": "Assignment",
+    "datetime": "2024-01-23T23:59:00",
+    "description": "Bài tập nhóm về thuật toán tìm kiếm"
+  }
+]

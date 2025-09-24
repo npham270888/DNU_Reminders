@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - DNU Reminder{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-xl shadow-md p-6 mb-6">
+    <div class="flex items-center space-x-4">
+        <div class="p-3 rounded-full bg-primary bg-opacity-10">
+            <i class="fas fa-home text-primary text-xl"></i>
+        </div>
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
+            <p class="text-gray-600">Chào mừng bạn trở lại, {{ current_user.username }}!</p>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-md p-6 text-white">
+        <div class="text-center">
+            <div class="mb-4">
+                <i class="fas fa-calendar text-4xl opacity-80"></i>
+            </div>
+            <h4 class="text-3xl font-bold mb-2">{{ events|length }}</h4>
+            <p class="text-sm opacity-90">Tổng sự kiện</p>
+        </div>
+    </div>
+    
+    <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-md p-6 text-white">
+        <div class="text-center">
+            <div class="mb-4">
+                <i class="fas fa-graduation-cap text-4xl opacity-80"></i>
+            </div>
+            <h4 class="text-3xl font-bold mb-2">{{ events|selectattr('event_type', 'equalto', 'Class')|list|length }}</h4>
+            <p class="text-sm opacity-90">Lịch học</p>
+        </div>
+    </div>
+    
+    <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl shadow-md p-6 text-white">
+        <div class="text-center">
+            <div class="mb-4">
+                <i class="fas fa-book text-4xl opacity-80"></i>
+            </div>
+            <h4 class="text-3xl font-bold mb-2">{{ events|selectattr('event_type', 'equalto', 'Assignment')|list|length }}</h4>
+            <p class="text-sm opacity-90">Bài tập</p>
+        </div>
+    </div>
+    
+    <div class="bg-gradient-to-r from-red-500 to-red-600 rounded-xl shadow-md p-6 text-white">
+        <div class="text-center">
+            <div class="mb-4">
+                <i class="fas fa-file-alt text-4xl opacity-80"></i>
+            </div>
+            <h4 class="text-3xl font-bold mb-2">{{ events|selectattr('event_type', 'equalto', 'Exam')|list|length }}</h4>
+            <p class="text-sm opacity-90">Thi cử</p>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Upcoming Events -->
+    <div class="lg:col-span-2">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2 rounded-lg bg-blue-100">
+                            <i class="fas fa-clock text-primary"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800">Sự kiện sắp tới</h3>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="divide-y divide-gray-200">
+                {% if events %}
+                    {% for event in events[:5] %}
+                    <div class="p-6 hover:bg-gray-50 transition-colors">
+                        <div class="flex justify-between items-start space-x-4">
+                            <div class="min-w-0 flex-1">
+                                <!-- Event Type Icon -->
+                                <div class="flex items-center mb-2">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
+                                        {% if event.event_type == 'Class' %}bg-green-100 text-green-800
+                                        {% elif event.event_type == 'Assignment' %}bg-yellow-100 text-yellow-800
+                                        {% elif event.event_type == 'Exam' %}bg-red-100 text-red-800
+                                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                        <i class="{% if event.event_type == 'Class' %}fas fa-graduation-cap
+                                                  {% elif event.event_type == 'Assignment' %}fas fa-book
+                                                  {% elif event.event_type == 'Exam' %}fas fa-file-alt
+                                                  {% else %}fas fa-calendar{% endif %} mr-1.5"></i>
+                                        {{ event.event_type }}
+                                    </span>
+                                    <span class="ml-2 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        {{ event.source }}
+                                    </span>
+                                </div>
+
+                                <!-- Event Title -->
+                                <h4 class="text-base font-medium text-gray-900 truncate">{{ event.title }}</h4>
+
+                                <!-- Date and Time -->
+                                <div class="mt-1 flex items-center text-sm text-gray-500">
+                                    <i class="fas fa-calendar mr-2"></i>
+                                    {{ event.datetime.strftime('%d/%m/%Y') }}
+                                    <span class="mx-2">·</span>
+                                    <i class="fas fa-clock mr-2"></i>
+                                    {{ event.datetime.strftime('%H:%M') }}
+                                </div>
+
+                                <!-- Description if exists -->
+                                {% if event.description %}
+                                <p class="mt-1 text-sm text-gray-600 line-clamp-2">{{ event.description }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex-shrink-0">
+                                <a href="{{ url_for('edit_event', event_id=event.id) }}" 
+                                   class="inline-flex items-center p-2 text-primary hover:bg-primary hover:bg-opacity-10 rounded-lg transition-colors">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    {% if events|length > 5 %}
+                    <div class="px-6 py-4 bg-gray-50">
+                        <a href="{{ url_for('events') }}" 
+                           class="flex items-center justify-center text-primary hover:text-primary-dark font-medium">
+                            <span>Xem tất cả sự kiện</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="p-6 text-center text-gray-500">
+                        <i class="fas fa-calendar-alt text-4xl mb-2"></i>
+                        <p>Chưa có sự kiện nào</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="lg:col-span-1 space-y-6">
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 rounded-lg bg-blue-100">
+                        <i class="fas fa-bolt text-primary"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800">Thao tác nhanh</h3>
+                </div>
+            </div>
+            <div class="p-6 space-y-4">
+                <a href="{{ url_for('new_event') }}" class="flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
+                    <i class="fas fa-plus mr-2"></i>
+                    <span>Tạo sự kiện mới</span>
+                </a>
+                <a href="{{ url_for('import_events') }}" class="flex items-center justify-center px-4 py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-colors">
+                    <i class="fas fa-upload mr-2"></i>
+                    <span>Import từ JSON</span>
+                </a>
+                <a href="{{ url_for('dnu_sync') }}" class="flex items-center justify-center px-4 py-2 border border-yellow-500 text-yellow-600 rounded-lg hover:bg-yellow-500 hover:text-white transition-colors">
+                    <i class="fas fa-sync mr-2"></i>
+                    <span>Đồng bộ với hệ thống DNU</span>
+                </a>
+                <a href="{{ url_for('calendar') }}" class="flex items-center justify-center px-4 py-2 border border-green-500 text-green-600 rounded-lg hover:bg-green-500 hover:text-white transition-colors">
+                    <i class="fas fa-calendar mr-2"></i>
+                    <span>Xem lịch</span>
+                </a>
+                <a href="{{ url_for('export_events') }}" class="flex items-center justify-center px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-500 hover:text-white transition-colors">
+                    <i class="fas fa-download mr-2"></i>
+                    <span>Export dữ liệu</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- User Information -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 rounded-lg bg-blue-100">
+                        <i class="fas fa-info-circle text-primary"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800">Thông tin</h3>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center space-x-2 text-gray-700 mb-2">
+                    <i class="fas fa-user"></i>
+                    <span class="font-medium">Tài khoản:</span>
+                    <span>{{ current_user.username }}</span>
+                </div>
+                <div class="flex items-center space-x-2 text-gray-700">
+                    <i class="fas fa-calendar-plus"></i>
+                    <span class="font-medium">Tham gia:</span>
+                    <span>{{ current_user.created_at.strftime('%d/%m/%Y') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

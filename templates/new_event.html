@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Tạo sự kiện mới - DNU Reminder{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center space-x-4">
+                <div class="p-3 rounded-full bg-primary bg-opacity-10">
+                    <i class="fas fa-plus text-primary text-xl"></i>
+                </div>
+                <h4 class="text-2xl font-bold text-gray-800">Tạo sự kiện mới</h4>
+            </div>
+        </div>
+        
+        <div class="p-6">
+            <form method="POST" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2">
+                        <label for="title" class="block text-sm font-medium text-gray-700">
+                            Tiêu đề sự kiện <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="title" name="title" required 
+                               class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                               placeholder="Ví dụ: Bài tập môn Toán, Lịch học môn Lập trình...">
+                    </div>
+
+                    <div>
+                        <label for="event_type" class="block text-sm font-medium text-gray-700">
+                            Loại sự kiện <span class="text-red-500">*</span>
+                        </label>
+                        <select id="event_type" name="event_type" required
+                                class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                            <option value="">Chọn loại...</option>
+                            <option value="Class">Lịch học</option>
+                            <option value="Assignment">Bài tập</option>
+                            <option value="Exam">Thi cử</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="datetime" class="block text-sm font-medium text-gray-700">
+                            Thời gian <span class="text-red-500">*</span>
+                        </label>
+                        <input type="datetime-local" id="datetime" name="datetime" required
+                               class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                    </div>
+
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700">
+                            Mô tả
+                        </label>
+                        <textarea id="description" name="description" rows="3"
+                                  class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary resize-none"
+                                  placeholder="Mô tả chi tiết về sự kiện (không bắt buộc)"></textarea>
+                    </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('events') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Quay lại
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Tạo sự kiện
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Help Section -->
+        <div class="card border-0 shadow mt-4">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Hướng dẫn tạo sự kiện
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6 class="text-success">
+                            <i class="fas fa-graduation-cap me-2"></i>Lịch học
+                        </h6>
+                        <p class="text-muted small">Các buổi học, seminar, thực hành theo lịch cố định</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="text-warning">
+                            <i class="fas fa-book me-2"></i>Bài tập
+                        </h6>
+                        <p class="text-muted small">Deadline nộp bài tập, báo cáo, dự án</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="text-danger">
+                            <i class="fas fa-file-alt me-2"></i>Thi cử
+                        </h6>
+                        <p class="text-muted small">Lịch thi giữa kỳ, cuối kỳ, kiểm tra</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Set default datetime to current time + 1 hour
+document.addEventListener('DOMContentLoaded', function() {
+    const now = new Date();
+    now.setHours(now.getHours() + 1);
+    now.setMinutes(0);
+    now.setSeconds(0);
+    now.setMilliseconds(0);
+    
+    const datetimeLocal = now.toISOString().slice(0, 16);
+    document.getElementById('datetime').value = datetimeLocal;
+});
+</script>
+{% endblock %}
